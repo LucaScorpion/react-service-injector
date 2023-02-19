@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { Service } from './Service';
+import { Service, SERVICE_WATERMARK } from './Service';
 
 export interface ServiceProvider<T> {
-  new (...args: never[]): T;
+  // Here we need to use any, as we don't know what the parameters are.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new (...args: any[]): T;
 }
 
 @Service()
@@ -33,8 +35,7 @@ export class Injector {
   }
 
   private instantiate<T>(target: ServiceProvider<T>): T {
-    const hasServiceDecorator = !!Reflect.getMetadata('service', target);
-    if (!hasServiceDecorator) {
+    if (!Reflect.hasMetadata(SERVICE_WATERMARK, target)) {
       throw new Error(
         `Service [${target.name}] is missing the @Service decorator`
       );
@@ -43,7 +44,18 @@ export class Injector {
     // When a class has no explicit constructor, the paramtypes will also be undefined.
     const paramTypes = Reflect.getMetadata('design:paramtypes', target) || [];
 
-    const instance = new target();
+    const args = [];
+    for (const param of paramTypes) {
+      if (!Reflect.hasMetadata(SERVICE_WATERMARK, param)) {
+        throw new Error(
+          `Cannot inject [${param.name}] while instantiating [${target.name}]`
+        );
+      }
+
+      args.push(this.resolve(param));
+    }
+
+    const instance = new target(...args);
     console.debug(`Instantiated service [${target.name}]`);
     return instance;
   }

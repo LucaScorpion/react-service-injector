@@ -1,8 +1,9 @@
 import { Injector } from '../src/Injector';
 import { CounterService } from './services/CounterService';
 import { CounterService as CounterService2 } from './services/CounterServiceDuplicate';
-import { WithParams } from './services/WithParams';
+import { InjectOne, InjectTwo, WithParams } from './services/WithParams';
 import { NoDecorator } from './services/NoDecorator';
+import { WithStringParam } from './services/WithStringParam';
 
 describe('Injector', () => {
   let i: Injector;
@@ -27,7 +28,17 @@ describe('Injector', () => {
 
   it('injects other classes into the constructor', () => {
     const w = i.resolve(WithParams);
-    throw new Error('TODO'); // TODO
+    expect(w.one).toBeInstanceOf(InjectOne);
+    expect(w.two).toBeInstanceOf(InjectTwo);
+
+    expect(i.resolve(InjectOne) === w.one).toBeTruthy();
+    expect(i.resolve(InjectTwo) === w.two).toBeTruthy();
+  });
+
+  it('errors when instantiating a service with a wrong constructor param', () => {
+    expect(() => i.resolve(WithStringParam)).toThrow(
+      'Cannot inject [String] while instantiating [WithStringParam]'
+    );
   });
 
   it('errors when instantiating a service without decorator', () => {
