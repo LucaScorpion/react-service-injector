@@ -1,9 +1,13 @@
+import 'reflect-metadata';
+import { Service } from './Service';
+
 export interface ServiceProvider<T> {
-  new(...args: unknown[]): T;
+  new (...args: never[]): T;
 }
 
+@Service()
 export class Injector {
-  private readonly instances = new Map<unknown, unknown>();
+  private readonly instances = new Map<ServiceProvider<unknown>, unknown>();
 
   public constructor() {
     this.bindTo(Injector, this);
@@ -29,7 +33,17 @@ export class Injector {
   }
 
   private instantiate<T>(target: ServiceProvider<T>): T {
-    const instance = new target(this.resolve(Injector));
+    const hasServiceDecorator = !!Reflect.getMetadata('service', target);
+    if (!hasServiceDecorator) {
+      throw new Error(
+        `Service [${target.name}] is missing the @Service decorator`
+      );
+    }
+
+    // When a class has no explicit constructor, the paramtypes will also be undefined.
+    const paramTypes = Reflect.getMetadata('design:paramtypes', target) || [];
+
+    const instance = new target();
     console.debug(`Instantiated service [${target.name}]`);
     return instance;
   }
