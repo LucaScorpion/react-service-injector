@@ -1,0 +1,10 @@
+# NPM
+node_modules/
+
+# Generated output
+dist/
+*.tgz
+
+# IDEs
+.idea/
+.vscode/
