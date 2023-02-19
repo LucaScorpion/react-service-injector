@@ -37,7 +37,7 @@ describe('Injector', () => {
 
   it('errors when instantiating a service with a wrong constructor param', () => {
     expect(() => i.resolve(WithStringParam)).toThrow(
-      'Cannot inject [String] while instantiating [WithStringParam]'
+      'Failed to instantiate [WithStringParam]: Service [String] is missing the @Service decorator'
     );
   });
 
@@ -51,5 +51,11 @@ describe('Injector', () => {
     i.bindTo(NoDecorator, new NoDecorator());
     const res = i.resolve(NoDecorator);
     expect(res).toBeInstanceOf(NoDecorator);
+  });
+
+  it('injects a non-service into the constructor when bound manually', () => {
+    i.bindTo(String, 'hello world');
+    const res = i.resolve(WithStringParam);
+    expect(res.value).toEqual('hello world');
   });
 });

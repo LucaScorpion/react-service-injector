@@ -2,7 +2,8 @@ import 'reflect-metadata';
 import { Service, SERVICE_WATERMARK } from './Service';
 
 export interface ServiceProvider<T> {
-  // Here we need to use any, as we don't know what the parameters are.
+  // Here we need to use any as we don't know what the parameters are,
+  // and we need to call the constructor with our own arguments.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (...args: any[]): T;
 }
@@ -46,13 +47,13 @@ export class Injector {
 
     const args = [];
     for (const param of paramTypes) {
-      if (!Reflect.hasMetadata(SERVICE_WATERMARK, param)) {
+      try {
+        args.push(this.resolve(param));
+      } catch (e) {
         throw new Error(
-          `Cannot inject [${param.name}] while instantiating [${target.name}]`
+          `Failed to instantiate [${target.name}]: ${(e as Error).message}`
         );
       }
-
-      args.push(this.resolve(param));
     }
 
     const instance = new target(...args);
