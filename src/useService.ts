@@ -1,14 +1,18 @@
 import { createContext, useContext } from 'react';
 import { Injector, ServiceProvider } from './Injector';
 
-const Context = createContext<Injector | undefined>(undefined);
+const InjectorContext = createContext<Injector | undefined>(undefined);
 
-export const InjectionProvider = Context.Provider;
+export const InjectorProvider = InjectorContext.Provider;
+
+export function useInjector(): Injector {
+  const injector = useContext(InjectorContext);
+  if (!injector) {
+    throw new Error('Wrap this component in an InjectorProvider');
+  }
+  return injector;
+}
 
 export function useService<T>(provider: ServiceProvider<T>): T {
-  const injector = useContext(Context);
-  if (!injector) {
-    throw new Error('Wrap this component in an InjectionProvider');
-  }
-  return injector.resolve(provider);
+  return useInjector().resolve(provider);
 }
