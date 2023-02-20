@@ -8,7 +8,7 @@ Hooks-based service injection for React.
 
 ## Installation
 
-First, install the required packages:
+Install the package:
 
 ```shell
 npm i react-service-injector
