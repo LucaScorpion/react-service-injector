@@ -1,9 +1,10 @@
 {
   "name": "react-service-injector",
-  "version": "0.1.0",
-  "description": "",
+  "version": "1.0.0-rc.1",
+  "description": "Hooks-based service injection for React",
   "main": "dist/index.js",
   "scripts": {
+    "prepack": "npm run build",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --max-warnings 0",
     "format": "npm run lint -- --fix",
@@ -11,8 +12,21 @@
   },
   "author": "Luca Scalzotto (https://github.com/LucaScorpion)",
   "license": "MIT",
+  "keywords": [
+    "dependency",
+    "di",
+    "hook",
+    "injection",
+    "injector",
+    "react",
+    "service"
+  ],
+  "homepage": "https://github.com/LucaScorpion/react-service-injector#readme",
+  "bugs": {
+    "url": "https://github.com/LucaScorpion/react-service-injector/issues"
+  },
   "peerDependencies": {
-    "react": "16|17|18"
+    "react": ">=16.8"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13"

@@ -1,5 +1,11 @@
 # React Service Injector
 
+[![Build](https://github.com/LucaScorpion/react-service-injector/actions/workflows/build.yml/badge.svg)](https://github.com/LucaScorpion/react-service-injector/actions/workflows/build.yml)
+[![NPM version](https://img.shields.io/npm/v/react-service-injector)](https://www.npmjs.com/package/react-service-injector)
+[![NPM bundle size](https://img.shields.io/bundlephobia/min/react-service-injector)](https://www.npmjs.com/package/react-service-injector)
+
+Hooks-based service injection for React.
+
 ## Installation
 
 First, install the required packages:
@@ -68,6 +74,18 @@ export const CounterComponent = () => {
   const counter = useService(CounterService);
 
   return <div>{counter.value}</div>;
+}
+```
+
+The injector will inject other services into the constructor:
+
+```typescript
+import { Service } from 'react-service-injector';
+import { CounterService } from './CounterService';
+
+@Service()
+export class AnotherService {
+  public constructor(private counter: CounterService) {}
 }
 ```
 
