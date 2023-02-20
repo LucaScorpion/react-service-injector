@@ -11,37 +11,17 @@ Hooks-based service injection for React.
 First, install the required packages:
 
 ```shell
-npm i react-service-injector reflect-metadata
+npm i react-service-injector
 ```
 
-Import `reflect-metadata` at the **first line** of your application:
-
-```typescript
-import 'reflect-metadata';
-// All other imports should come after this!
-```
-
-Enable emitting decorator metadata and experimental decorators in your TypeScript configuration:
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
-}
-```
-
-Finally, in the root of your application, wrap your app component in an `InjectionProvider`:
+In the root of your application, wrap your app component in an `InjectorProvider`:
 
 ```tsx
 import { Injector, InjectorProvider } from 'react-service-injector';
 
 const injector = new Injector();
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
     <InjectorProvider value={injector}>
@@ -51,20 +31,20 @@ root.render(
 );
 ```
 
+That's it!
+You're now ready to start using the injector.
+
 ## Usage
 
-To define an injectable service, you need a class with the `@Service()` decorator:
+To define an injectable service, you can simply create a class:
 
 ```typescript
-import { Service } from 'react-service-injector';
-
-@Service()
 export class CounterService {
   public value = 0;
 }
 ```
 
-To use a service in your components, use the `useService` hook:
+Then, to use this service in your components, use the `useService` hook:
 
 ```tsx
 import { useService } from 'react-service-injector';
@@ -77,22 +57,26 @@ export const CounterComponent = () => {
 }
 ```
 
-The injector will inject other services into the constructor:
+The injector will inject itself into the constructor of any class it instantiates.
+With this you can inject other services in a service class:
 
 ```typescript
-import { Service } from 'react-service-injector';
+import { Injector } from 'react-service-injector';
 import { CounterService } from './CounterService';
 
-@Service()
 export class AnotherService {
-  public constructor(private counter: CounterService) {}
+  private readonly counter: CounterService;
+
+  public constructor(injector: Injector) {
+    this.counter = injector.resolve(CounterService);
+  }
 }
 ```
 
 ### Manually Binding Services
 
 Sometimes it may be necessary to create a manual binding for a service instance,
-rather than letting the Injector figure it out.
+rather than letting the Injector instantiate it.
 This can be especially useful when dealing with services from other packages.
 
 ```typescript

@@ -1,30 +1,29 @@
-import 'reflect-metadata';
-import { Service, SERVICE_WATERMARK } from './Service';
-
-export interface ServiceProvider<T> {
-  // Here we need to use any as we don't know what the parameters are,
-  // and we need to call the constructor with our own arguments.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new (...args: any[]): T;
+export interface Service<T> {
+  new (...args: never[]): T;
 }
 
-@Service()
+export interface ServiceProvider<T> {
+  new (injector: Injector): T;
+}
+
 export class Injector {
-  private readonly instances = new Map<ServiceProvider<unknown>, unknown>();
+  private readonly instances = new Map<Service<unknown>, unknown>();
 
   public constructor() {
     this.bindTo(Injector, this);
   }
 
-  public bindTo<T>(target: ServiceProvider<T>, instance: T): void {
+  public bindTo<T>(target: Service<T>, instance: T): void {
     this.instances.set(target, instance);
   }
 
-  public resolve<T>(target: ServiceProvider<T>): T {
+  public resolve<T>(target: Service<T>): T {
     let instance = this.instances.get(target) as T | undefined;
 
     if (!instance) {
-      instance = this.instantiate(target);
+      // Here we have to assume the target is a valid ServiceProvider,
+      // but there's no way to check that without using the `design:paramtypes` metadata.
+      instance = this.instantiate(target as ServiceProvider<T>);
       this.bindTo(target, instance);
     }
 
@@ -36,27 +35,7 @@ export class Injector {
   }
 
   private instantiate<T>(target: ServiceProvider<T>): T {
-    if (!Reflect.hasMetadata(SERVICE_WATERMARK, target)) {
-      throw new Error(
-        `Service [${target.name}] is missing the @Service decorator`
-      );
-    }
-
-    // When a class has no explicit constructor, the paramtypes will also be undefined.
-    const paramTypes = Reflect.getMetadata('design:paramtypes', target) || [];
-
-    const args = [];
-    for (const param of paramTypes) {
-      try {
-        args.push(this.resolve(param));
-      } catch (e) {
-        throw new Error(
-          `Failed to instantiate [${target.name}]: ${(e as Error).message}`
-        );
-      }
-    }
-
-    const instance = new target(...args);
+    const instance = new target(this);
     console.debug(`Instantiated service [${target.name}]`);
     return instance;
   }
