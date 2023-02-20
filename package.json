@@ -1,6 +1,6 @@
 {
   "name": "react-service-injector",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0",
   "description": "Hooks-based service injection for React",
   "main": "dist/index.js",
   "scripts": {
