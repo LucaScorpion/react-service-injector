@@ -1,8 +1,9 @@
 # React Service Injector
 
 [![Build](https://github.com/LucaScorpion/react-service-injector/actions/workflows/build.yml/badge.svg)](https://github.com/LucaScorpion/react-service-injector/actions/workflows/build.yml)
-[![NPM version](https://img.shields.io/npm/v/react-service-injector)](https://www.npmjs.com/package/react-service-injector)
 [![NPM bundle size](https://img.shields.io/bundlephobia/min/react-service-injector)](https://www.npmjs.com/package/react-service-injector)
+
+[![npm](https://npmbadge.com/npm/react-service-injector)](https://www.npmjs.com/package/react-service-injector)
 
 Hooks-based service injection for React.
 
